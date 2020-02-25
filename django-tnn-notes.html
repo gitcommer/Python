@@ -1,0 +1,1270 @@
+<!--
+https://www.youtube.com/watch?v=n-FTlQ7Djqc&list=PL4cUxeGkcC9ib4HsrXEYpQnTOTZE1x0uc
+git: https://github.com/iamshaunjp/django-playlist
+
+
+
+NOTES
+*****
+url(r'^about/$', views.about), 		- '^about/$' is like '/about/' or the start and the end of the strings
+GET - receiving data from the database
+POST - sending data from the database
+urls.py - is use for address bar path like .com/about
+views.py - get the html page to display
+
+
+
+ACCOUNTS
+********
+pitch, aaaa1234
+
+
+
+2. INSTALL DJANGO & CREATE PROJECT ADMIN
+3. DISPLAY TEXT USING URLS & VIEWS
+4. DISPLAY HTML
+5. CREATE APPS INSIDE ADMIN APPS
+6-7. DATABASE, MODELS, MIGRATIONS
+SERVER
+8. ORM (query to database/crud using console)
+9. CREATE ADMIN USER & DISPLAY ARTICLES APPS TO ADMIN PAGE (you can crud data here)
+10. DISPLAY ARTICLES DATA TO THE PAGE
+DISPLAY DATABASE/MODELS DATA TO SUB APPS PAGE
+11. DISPLAY MODEL METHOD or FUNCTION like example display only 50 character
+12. STATIC FILES & IMAGES like css, js, jquery, background image
+13. EXTENDING TEMPLATES - like buk-on nimo ang header or footer or other content in the page
+14-15. DISPLAY LINK IN THE URL, display image
+16. CLICK LINK & DISPLAY DATA OF THE DATABASE
+17. UPLOADING MEDIA - insert to database, display image and default image in articles
+18-20. REGISTER USER ACCOUNTS APP - register, form trapping, user already exist
+								  - adto ma save sa admin ang new register pero dili maka login as admin
+21. LOGIN & REDIRECT TO PAGE
+22. sign-up and login new user but this user cant access the admin
+23. LOGOUT BUTTON
+24-25. IF NOT LOGIN REDIRECT TO LOGIN PAGE IF LOGIN REDIRECT TO HOME PAGE
+26. insert text, textarea and image, use forms.py represent of models
+27. FOREIGN KEYS - insert text, textarea, image and author(the user who login)
+28. CHECKING LOGIN STATUS - check if user login or not, display login/singup or logout
+29. REDIRECT THE HOMEPAGE
+
+
+
+2. INSTALL DJANGO & CREATE PROJECT ADMIN
+****************************************
+1. download and install python 3
+2. C:\project-folder> pip install django 							#install django to folder (folder are still empty when done install)
+3. C:\project-folder> django-admin startproject djangonautic 		#create admin (or the base app) project and name it djangonautic (this will create 2 djangonautic folder)
+
+
+3. DISPLAY TEXT USING URLS & VIEWS
+**********************************
+1. djangonautic\urls.py
+
+		from django.conf.urls import url  #url is use for address bar path
+		from django.contrib import admin  #admin is use for authentication
+		from . import views 			  #1. views.py same folder
+
+		urlpatterns = [
+		    url(r'^admin/', admin.site.urls),
+		    url(r'^about/$', views.about), 		#2. views.py, about function like http://localhost:8000/about/ for '^about/$' or about page
+		    url(r'^$', views.homepage), 		#3. views.py, home function like http://localhost:8000/ for '^$' or homepage or whatever .com
+		]
+
+2. djangonautic\ create views.py if nothing
+
+		from django.http import HttpResponse 	#HttpResponse is use to send client request or page like if click about page, send about page
+
+		def homepage(request): 					#1. if use click homepage link
+		    return HttpResponse('homepage') 	#2. return or display homepage
+
+		def about(request):
+		    return HttpResponse('about')
+
+
+3. to run 	
+
+		C:\project-folder\djangonautic> python manage.py runserver
+		http://localhost:8000/homepage/
+
+
+4. DISPLAY HTML
+***************
+1. djangonautic\urls.py
+
+		from django.conf.urls import url 	#url is use for address bar path
+		from django.contrib import admin 	#admin is use for authentication
+		from . import views 				#views.py same folder
+
+		urlpatterns = [
+		    url(r'^admin/', admin.site.urls),
+		    url(r'^about/$', views.about), 		#views.py, about function like http://localhost:8000/about/
+		    url(r'^$', views.homepage), 		#3. views.py, home function like http://localhost:8000/
+		]
+
+2. djangonautic\views.py
+
+		from django.http import HttpResponse 	#HttpResponse is use to send client request or page like if click about page, send about page
+		from django.shortcuts import render 	#render is use to display html
+
+		def homepage(request):							#1. if click homepage link
+		    return render(request, 'homepage.html') 	#2. return or display the html homepage.html
+
+		def about(request):
+		    return render(request, 'about.html')
+
+3. djangonautic\settings.py
+
+		TEMPLATES = [
+		    {
+		        'DIRS': ['templates'], 	#meaning naa sa templates (folder) imong mga html file
+
+4. djangonautic(main folder)\templates\homepage.html
+
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>Homepage</title>
+		    </head>
+		    <body>
+		        <h1>This is the homepage</h1>
+		        <p>Welcome to Djangonauts</p>
+		    </body>
+		</html>
+
+5. djangonautic(main folder)\templates\about.html
+
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>About</title>
+		    </head>
+		    <body>
+		        <h1>About Us</h1>
+		        <p>We like django.</p>
+		    </body>
+		</html>
+
+
+SERVER
+******
+C:\project-folder\djangonautic> python manage.py runserver 			#this will run 127.0.0.8000 (no need to open xamp because this is built-in server in django)
+																	#this will also authomatically create db.sqlite3
+
+
+5. CREATE APPS INSIDE ADMIN APPS
+********************************
+1. C:\project-folder\djangonautic> python manage.py startapp articles 					# this will create new app and name articles
+2. C:\project-folder\djangonautic\articles\urls.py> 									# create urls.py inside articles folder
+
+		from django.conf.urls import url
+		from . import views 	#1. views.py in the same folder
+
+		urlpatterns = [
+		    url(r'^$', views.article_list), 	#2. views.py, article_list function
+		]
+
+3. C:\project-folder\djangonautic\articles\views.py> 									
+
+		from django.shortcuts import render
+
+		def article_list(request):
+		    return render(request, 'articles/article_list.html') 	#1. articles\templates\articles\article_list.html
+
+4. C:\project-folder\djangonautic\articles\templates\articles\article_list.html>		# create article_list.html inside articles folder
+
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title></title>
+		    </head>
+		    <body>
+		        <h1>Articles List</h1>
+		    </body>
+		</html>
+
+5. C:\project-folder\djangonautic\djangonautic\settings.py> 							# add this at the bottom
+
+		INSTALLED_APPS = [
+		    'articles',
+		]
+
+6. C:\project-folder\djangonautic\djangonautic\urls.py> 								# register the sub apps or the articles apps
+
+		from django.conf.urls import url, include 	#1.
+		from django.contrib import admin
+		from . import views
+
+		urlpatterns = [
+		    url(r'^admin/', admin.site.urls),
+		    url(r'^articles/', include('articles.urls')), 	#2. articles(folder), urls.py to run localhost:8000/articles/
+		    url(r'^about/$', views.about),
+		    url(r'^$', views.homepage),
+		]
+
+# to run: 	C:\project-folder\djangonautic> python manage.py runserver
+#			http://localhost:8000/articles/
+
+
+
+6-7. DATABASE, MODELS, MIGRATIONS
+*********************************
+1. models.py 	# here you can manage database tables
+
+				from django.db import models 	#1. models.py
+
+				# Create your models here.
+				class Article(models.Model):
+				    title = models.CharField(max_length=100)
+				    slug = models.SlugField()
+				    body = models.TextField()
+				    date = models.DateTimeField(auto_now_add=True)
+				    # add in thumbnail later
+				    # add in author later
+
+2. C:\project-folder\djangonautic> python manage.py migrate
+3. C:\project-folder\djangonautic> python manage.py makemigrations
+
+Note: 	- this will create file in C:\project-folder\djangonautic\articles\migrations\0001_initial.py>
+		- after makemigrations it will automatically create id for primary key
+		- everytime you make changes in models.py always run the python manage.py makemigrations and python manage.py migrate
+
+
+
+8. ORM (query to database/crud using console)
+*********************************************
+1. C:\project-folder\djangonautic> python manage.py shell 	# this will open an interactive shell like this >>>
+
+sample1: 	>>> from articles.models import Article 		# input: articles(folder), models.py class Article
+			>>> Article 							 		# input: 
+			<class 'articles.models.Article'>		 		# output: 
+
+retrieve:	>>> Article.objects.all() 						# input: same with select all Article(table) in the database
+			<QuerySet []>									# ouput: meaning no data inserted
+
+			>>> <title></title>								# input: meaning select the title of the first id or the first data
+			
+
+insert:		>>> article = Article() 						# input: create aticle object
+			>>> article 			 						# input:
+			<Article: Article object> 				 		# output: 
+
+			>>> article.title = "Hello, world"				# input: insert data to title field
+			>>> article.title 								# input
+			'hello, world' 									# output
+			>>> article.save() 								# input: this will save hello, world in the database in the title field
+			>>> Article.objects.all() 						# input: same with select all Article(table) in the database
+			<QuerySet [<Article: Article object <1>>]> 		# ouput: meaning 1 data inserted
+
+			>>> Article.objects.all()[0].title
+			'hello, world'
+
+close orm: 	>>> ^Z or cntrl+z
+
+--------------------------------------------------------------------------------------------
+
+sample2:  update this part to this
+
+  1. models.py 	# here you can manage database tables
+
+				from django.db import models
+
+				# Create your models here.
+				class Article(models.Model):
+				    title = models.CharField(max_length=100)
+				    slug = models.SlugField()
+				    body = models.TextField()
+				    date = models.DateTimeField(auto_now_add=True)
+				    # add in thumbnail later
+				    # add in author later
+
+				    def __str__(self): 		#note: ang outpur niya sa orm kay <QuerySet [<Article: Hello, world>]> dili na ingon ani <QuerySet [<Article: Article object <1>>]>
+				        return self.title
+
+
+2. C:\project-folder\djangonautic> python manage.py shell 	# this will open an interactive shell like this >>>
+
+retrieve: 	>>> from articles.models import Article 		# input: articles(folder), models.py add library import Article
+			>>> Article.objects.all() 				 		# input: 
+			<QuerySet [<Article: Hello, world>]>	 		# output: lain na ang output dili na ingon ani <QuerySet [<Article: Article object <1>>]>
+
+insert:		>>> article2 = Article() 						# input: insert other data
+			>>> article2.title = "Django Rules"				# input:
+			>>> article2.save() 							# input:
+
+			>>> Article.objects.all() 				 		# input: display new inserted data
+			<QuerySet [<Article: Hello, world>, [<Article: Django, Rules>]>
+
+close orm: 	>>> ^Z or cntrl+z
+
+
+
+9. CREATE ADMIN USER & DISPLAY ARTICLES APPS TO ADMIN PAGE (you can crud data here)
+***********************************************************************************
+note: display articles database/models to admin page where you can crud data
+
+1. C:\project-folder\djangonautic> python manage.py runserver
+2. http://localhost:8000/admin/															# this will open admin login page
+3. create account: C:\project-folder\djangonautic> python manage.py createsuperuser 	# create username and password
+
+4. articles\admin.py 					
+											
+   	from django.contrib import admin 	#1. admin.py
+	from . models import Article 		#2. from models.py the class Article
+
+	admin.site.register(Article) 		#3. register Article class or database or models to admin login page
+
+
+10 DISPLAY ARTICLES DATA TO THE PAGE
+************************************
+articles\views.py	
+	from django.shortcuts import render
+	from . models import Article 	#1. models.py class Article
+
+	# Create your views here.
+	def article_list(request):
+		articles = Article.objects.all().order_by('date') 	#2. select * from Articles table order by date
+		return render(request, 'articles/article_list.html', {'articles': articles}) 	#3. 'articles' data will display to article_list.html	
+
+articles\templates\articles\article_lisht.html
+	<body>
+		<h1>Article List</h1>
+		<div class="articles">
+			{% for article in articles %}
+				<div class="article">
+					<h2><a href="#">{{ article.title }}</a></h2>
+					<p>{{ article.body }}</p>
+					<p>{{ article.date }}</p>
+				</div>
+			{% endfor %}
+		</div>
+	</body>
+
+
+11. DISPLAY MODEL METHOD or FUNCTION
+************************************
+1. articles\models.py 	from django.db import models
+
+						# Create your models here.
+						class Article(models.Model):
+							title = models.CharField(max_length=100)
+							slug = models.SlugField()
+							body = models.TextField()
+							date = models.DateTimeField(auto_now_add=True)
+							# add in thumbnail later
+							# add in author later
+
+							def __str__(self):
+								return self.title
+
+							def snippet(self): 					#1. display only 50 character from body field
+								return self.body[:50] + '...'
+
+2. articles\templates\articles\article_lisht.html
+	<body>
+		<h1>Article List</h1>
+		<div class="articles">
+			{% for article in articles %}
+				<div class="article">
+					<h2><a href="#">{{ article.title }}</a></h2>
+					<p>{{ article.snippet }}</p> 				#2. 
+					<p>{{ article.date }}</p>
+				</div>
+			{% endfor %}
+		</div>
+	</body>
+
+
+12. STATIC FILES & IMAGES
+*************************
+djangonautic\urls.py 		from django.contrib import admin 	
+							from django.urls import path, include 				
+							from . import views
+							from django.contrib.staticfiles.urls import staticfiles_urlpatterns 	#1. library for static files like css, jquery
+
+							urlpatterns = [
+							    path('admin/', admin.site.urls), 				
+							    path('articles/', include('articles.urls')), 	
+							    path('about/', views.about),				
+							    path('homepage/', views.homepage),			
+							]
+
+							urlpatterns += staticfiles_urlpatterns() 	#2. use the library
+
+
+djangonautic\settings.py 	STATIC_URL = '/static/'
+
+							STATICFILES_DIRS = (						#1.
+							    os.path.join(BASE_DIR, 'assets'),
+							)	
+
+
+djangonautic\assets\styles.py 	body {
+										background: #0f121f;
+										background-image: url(stars.png); 	/*or url(/static/stars.png);*/
+										background-repeat-y: no-repeat;
+										color: #fff;  
+									}
+
+									body *{
+										font-family: Ubuntu;
+									}
+
+									h1, h2, h3, h4, h5{
+										font-weight: normal;
+										margin: 0;
+									}
+
+									a, a:hover, a:visited{
+										color: #fff;
+										text-decoration: none;
+									}	
+
+
+djangonautic\articles\templates\articles\article_list.html
+
+		{% load static from staticfiles %} 		#1. djangonautic\assets\settings.py
+
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Articles</title>
+			<link rel="stylesheet" type="text/css" href="/static/styles.css">
+			or
+			<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}"> 	#2. use this if use library on top
+		</head>
+
+
+13. EXTENDING TEMPLATES
+*******************
+1. djangonautic(main)\templates\base_layout.html
+
+		{% load static from staticfiles %}
+
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Articles</title>
+			<link rel="stylesheet" type="text/css" href="/static/styles.css">
+			or
+			<link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}"> 	# use this if use library on top
+		</head>
+		<body>
+			<div class="wrapper">
+				{% block content %} 	# unsay naay ingon ani sa lain na page kay i display niya diri
+
+				{% endblock %}
+			</div>
+		</body>
+		</html>
+
+
+2. djangonautic\articles\templates\articles\article_list.html
+
+		{% extends 'base_layout.html' %} 	#1. this will extend the header and footer
+
+		{% block content %} 				#2. this will display to other content of the page
+			<h1>Article List</h1>
+			<div class="articles">
+				{% for article in articles %}
+					<div class="article">
+						<h2><a href="#">{{ article.title }}</a></h2>
+						<p>{{ article.snippet }}</p>
+						<p>{{ article.date }}</p>
+					</div>
+				{% endfor %}
+			</div>
+		{% endblock %}
+
+
+14-15. DISPLAY LINK IN THE URL
+******************************
+1. djangonautic\articles\urls.py
+		
+		from django.conf.urls import url
+		from . import views
+
+		#this is use para naa sa articles ra tanan ang url slug
+		app_name = 'articles' 	#1.
+
+		urlpatterns = [
+		    url(r'^$', views.article_list, name="list"), 	#2.
+		    url(r'^(?P<slug>[\w-]+)/$', views.article_detail, name="detail"), 	#3.
+		]
+
+2. djangonautic\articles\views.py
+
+		from django.http import HttpResponse
+		from django.shortcuts import render
+		from .models import Article
+
+		def article_list(request):
+		    articles = Article.objects.all().order_by('date');
+		    return render(request, 'articles/article_list.html', { 'articles': articles })
+
+		def article_detail(request, slug):
+		    return HttpResponse(slug)
+
+3. djangonautic\articles\tempaltes\articles\article_list.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content%}
+		    <h1>Articles List</h1>
+		    <div class="articles">
+		    {% for article in articles %}
+		        <div class="article">
+		            <h2><a href="{% url 'articles:detail' slug=article.slug %}">{{ article.title }}</a></h2>    #1.
+		            <p>{{ article.snippet }}</p>
+		            <p>{{ article.date }}</p>
+		        </div>
+		    {% endfor %}
+		    </div>
+		{% endblock %}	
+
+4. djangonautic\articles\tempaltes\articles\base_layout.html
+
+		{% load static from staticfiles %}
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>Djangonauts</title>
+		        <link rel="stylesheet" href="{% static 'styles.css' %}">
+		    </head>
+		    <body>
+		        <header class="wrapper">
+		            <h1><a href="{% url 'articles:list' %}"><img src="{% static 'logo.png' %}" alt="djangonautic" /></a></h1>    #1.
+		        </header>
+		        <div class="wrapper">
+		            {% block content %}
+		            {% endblock %}
+		        </div>
+		    </body>
+		</html>
+
+to run: http://localhost:8000/articles/
+
+
+16. CLICK LINK & DISPLAY DATA OF THE DATABASE
+*********************************************
+1. djangonautic\articles\views.py
+		
+		from django.http import HttpResponse
+		from django.shortcuts import render
+		from .models import Article
+
+		def article_list(request):
+		    articles = Article.objects.all().order_by('date');
+		    return render(request, 'articles/article_list.html', { 'articles': articles })
+
+		def article_detail(request, slug): 	#1.
+		    # return HttpResponse(slug)
+		    article = Article.objects.get(slug=slug)
+		    return render(request, 'articles/article_detail.html', {'article': article})
+
+2. djangonautic\articles\tempaltes\articles\article_detail.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		<div class="article-detail">
+			<div class="article">
+				<img src="{{ article.thumb.url }}">
+				<h2>{{ article.title }}</h2>
+				<p>{{ article.body }}</p>
+				<p>{{ article.date }}</p>
+			</div>
+		</div>
+		{% endblock %}
+
+
+17. UPLOADING MEDIA
+*******************
+1. project-folder\djangonautic\settings.py 			# add this in the bottom
+
+	MEDIA_URL = '/media/'                           #1.
+	MEDIA_ROOT = os.path.join(BASE_DIR, 'media')    #2.
+
+2. project-folder\djangonautic\urls.py
+
+	from django.contrib import admin 	
+	from django.urls import path, include 				
+	from . import views
+	from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+	from django.conf.urls.static import static 	#1.	
+	from django.conf import settings 	#2.								
+
+	urlpatterns = [
+	    path('admin/', admin.site.urls), 				
+	    path('articles/', include('articles.urls')), 	
+	    path('about/', views.about),				
+	    path('homepage/', views.homepage),			
+	]
+
+	urlpatterns += staticfiles_urlpatterns() 
+
+	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 	#3.
+
+3. project-folder\djangonautic\articles\models.py
+
+	from django.db import models
+
+	# Create your models here.
+	class Article(models.Model):
+		title = models.CharField(max_length=100)
+		slug = models.SlugField()
+		body = models.TextField()
+		date = models.DateTimeField(auto_now_add=True)
+		thumb = models.ImageField(default='default.png', blank=True) 	#1. this will display default image, blank=True or blank field
+		# add in author later
+
+		def __str__(self):
+			return self.title
+
+		def snippet(self):
+			return self.body[:50] + '...'
+
+4. project-folder\djangonautic> pip install Pillow
+5. project-folder\djangonautic> python manage.py makemigrations
+6. project-folder\djangonautic> python manage.py migrate
+
+7. project-folder\djangonautic\articles\templates\articles\article_detail.html
+
+		
+	{% block content %}
+	<div class="article-detail">
+		<div class="article">
+			<img src="{{ article.thumb.url }}"> 	#1.
+			<h2>{{ article.title }}</h2>
+			<p>{{ article.body }}</p>
+			<p>{{ article.date }}</p>
+		</div>
+	</div>
+	{% endblock %}
+
+
+18-20. REGISTER USER ACCOUNTS APP
+*********************************
+1. project-folder\djangonautic> python manage.py startapp accounts 		# this will create new mvc app folder name account
+2. project-folder\djangonautic\settings.py 								# add this in the bottom
+
+		INSTALLED_APPS = [ 
+			'accounts',
+		]
+
+3. project-folder\djangonautic\accounts\urls.py 						# create urls.py and add
+
+		from django.conf.urls import url
+		from . import views
+
+		app_name = 'accounts'
+
+		urlpatterns = [
+		    url(r'^signup/$', views.signup_view, name="signup"),
+		]
+
+4. project-folder\djangonautic\urls.py 
+
+		from django.conf.urls import url, include
+		from django.contrib import admin
+		from . import views
+		from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+		from django.conf.urls.static import static
+		from django.conf import settings
+
+		urlpatterns = [
+		    url(r'^admin/', admin.site.urls),
+		    url(r'^articles/', include('articles.urls')), 	#1.
+		    url(r'^accounts/', include('accounts.urls')),
+		    url(r'^about/$', views.about),
+		    url(r'^$', views.homepage),
+		]
+
+		urlpatterns += staticfiles_urlpatterns()
+		urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+5. project-folder\djangonautic\accounts\views.py
+
+		from django.shortcuts import render, redirect
+		from django.contrib.auth.forms import UserCreationForm 	#1
+
+		def signup_view(request):
+		    if request.method == 'POST':
+		         form = UserCreationForm(request.POST)
+		         if form.is_valid():
+		             form.save()
+		             #  log the user in
+		             return redirect('articles:list')
+		    else:
+		        form = UserCreationForm() 	#2
+		    return render(request, 'accounts/signup.html', { 'form': form }) 	#3
+
+6. project-folder\djangonautic\accounts\templates\accounts\signup.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		    <h1>Signup</h1>
+		    <form class="site-form" action="{% url 'accounts:signup' %}" method="post">
+		        {% csrf_token %}
+		        {{ form }}
+		        <input type="submit" value="Signup">
+		    </form>
+		{% endblock %}
+
+to run: localhost:8000/accounts/signup/
+
+
+21. LOGIN & REDIRECT TO PAGE
+****************************
+1. django-playlist\djangonautic\accounts\urls.py
+
+		from django.conf.urls import url
+		from . import views
+
+		app_name = 'accounts'
+
+		urlpatterns = [
+		    url(r'^signup/$', views.signup_view, name="signup"),
+		    url(r'^login/$', views.login_view, name="login"), 		#1.
+		]
+
+2. django-playlist\djangonautic\accounts\views.py
+
+		from django.shortcuts import render, redirect
+		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
+		def login_view(request):                                #1. this will receive tha data when forms is submit
+		    if request.method == 'POST':
+		        form = AuthenticationForm(data=request.POST)    #2. check if data exists
+		        if form.is_valid():
+		            # log the user in
+		            return redirect('articles:list')            #3. articles folder, article_list.html
+		    else:
+		        form = AuthenticationForm()
+		    return render(request, 'accounts/login.html', { 'form': form })
+
+3. django-playlist\djangonautic\accounts\templates\accounts\login.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		    <h1>Log in</h1>
+		    <form class="site-form" action="{% url 'accounts:login' %}" method="post">
+		        {% csrf_token %}
+		        {{ form }}
+		        <input type="submit" value="Login" />
+		    </form>
+		    <p>Not got an account? <a href="{% url 'accounts:signup' %}">Sign Up</a></p>
+		{% endblock %}
+
+to run: http://localhost:8000/accounts/login/
+how this works: login.html, urls.py, views.py
+
+
+
+22. sign-up and login new user but this user cant access the admin
+******************************************************************
+1. django-playlist\djangonautic\accounts\urls.py
+
+		from django.conf.urls import url
+		from . import views
+
+		app_name = 'accounts'
+
+		urlpatterns = [
+		    url(r'^signup/$', views.signup_view, name="signup"),
+		    url(r'^login/$', views.login_view, name="login"), 		#1.
+		]
+
+2. django-playlist\djangonautic\accounts\views.py
+
+		from django.shortcuts import render, redirect
+		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+		from django.contrib.auth import login 
+
+		def signup_view(request):
+		    if request.method == 'POST':
+		         form = UserCreationForm(request.POST)
+		         if form.is_valid():
+		            user = form.save()                  #1.
+		            #  log the user in
+		            login(request, user)                #2.
+		            return redirect('articles:list')
+		    else:
+		        form = UserCreationForm()
+		    return render(request, 'accounts/signup.html', { 'form': form })
+
+		def login_view(request): 			#note: dont name just login but login_view so that django dont confuse                               
+		    if request.method == 'POST':
+		        form = AuthenticationForm(data=request.POST)   
+		        if form.is_valid():
+		            # log the user in
+		            user = form.get_user() 	#get the username and password of the user             
+		            login(request, user)    #let the user login
+		            return redirect('articles:list')            
+		    else:
+		        form = AuthenticationForm()
+		    return render(request, 'accounts/login.html', { 'form': form })
+
+3. django-playlist\djangonautic\accounts\templates\accounts\login.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		    <h1>Log in</h1>
+		    <form class="site-form" action="{% url 'accounts:login' %}" method="post">
+		        {% csrf_token %}
+		        {{ form }}
+		        <input type="submit" value="Login" />
+		    </form>
+		    <p>Not got an account? <a href="{% url 'accounts:signup' %}">Sign Up</a></p>
+		{% endblock %}
+
+to run: localhost:8000/accounts/signup/
+		http://localhost:8000/accounts/login/
+
+note: if mo login ka sa login form kay naka login nsd siya automatically sa admin as shaun
+
+
+23. LOGOUT BUTTON
+*****************
+1. django-playlist\djangonautic\accounts\urls.py
+
+		from django.conf.urls import url
+		from . import views
+
+		app_name = 'accounts'
+
+		urlpatterns = [
+		    url(r'^signup/$', views.signup_view, name="signup"),
+		    url(r'^login/$', views.login_view, name="login"), 		
+		    url(r'^logout/$', views.login_view, name="logout"), 	#1.
+		]
+
+2. django-playlist\djangonautic\accounts\views.py
+
+		from django.shortcuts import render, redirect
+		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+		from django.contrib.auth import login 
+
+		def signup_view(request):
+		    if request.method == 'POST':
+		         form = UserCreationForm(request.POST)
+		         if form.is_valid():
+		            user = form.save()                 
+		            #  log the user in
+		            login(request, user)                
+		            return redirect('articles:list')
+		    else:
+		        form = UserCreationForm()
+		    return render(request, 'accounts/signup.html', { 'form': form })
+
+		def login_view(request):                                
+		    if request.method == 'POST':
+		        form = AuthenticationForm(data=request.POST)   
+		        if form.is_valid():
+		            # log the user in
+		            user = form.get_user()              
+		            login(request, user)                
+		            return redirect('articles:list')            
+		    else:
+		        form = AuthenticationForm()
+		    return render(request, 'accounts/login.html', { 'form': form })
+
+		def logout_view(request):                   #1. 
+		    if request.method == 'POST':
+		        logout(request)                     #2. this is the built-in logout function
+		        return redirect('articles:list')    #3. articles app, list path
+
+3. django-playlist\djangonautic\templates\base_layout.html
+
+		{% load static from staticfiles %}
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>Djangonauts</title>
+		        <link rel="stylesheet" href="{% static 'styles.css' %}">
+		    </head>
+		    <body>
+		        <header class="wrapper">
+		            <h1><a href="{% url 'articles:list' %}"><img src="{% static 'logo.png' %}" alt="djangonautic" /></a></h1>
+		            <nav>
+		                <ul>
+		                    <li>
+		                        <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">   #2
+		                            {% csrf_token %}
+		                            <button type="submit">Logout</button>   #1
+		                        </form>
+		                    </li>
+		                </ul>
+		            </nav>
+		        </header>
+		        <div class="wrapper">
+		            {% block content %}
+		            {% endblock %}
+		        </div>
+		    </body>
+		</html>
+
+to run: localhost:8000/articles/
+
+
+24-25. IF NOT LOGIN REDIRECT TO LOGIN PAGE IF LOGIN REDIRECT TO HOME PAGE
+*************************************************************************
+1. django-playlist\djangonautic\articles\urls.py
+
+		from django.conf.urls import url
+		from . import views
+
+		app_name = 'articles'
+
+		urlpatterns = [
+		    url(r'^$', views.article_list, name="list"),
+		    url(r'^create/$', views.article_create, name="create"), 			#1. views.py, article_create function
+		    url(r'^(?P<slug>[\w-]+)/$', views.article_detail, name="detail"),
+		]
+
+2. django-playlist\djangonautic\articles\views.py
+
+		from django.http import HttpResponse
+		from django.shortcuts import render
+		from .models import Article
+		from django.contrib.auth.decorators import login_required 	#1. library for required login
+
+		def article_list(request):
+		    articles = Article.objects.all().order_by('date');
+		    return render(request, 'articles/article_list.html', { 'articles': articles })
+
+		def article_detail(request, slug):
+		    # return HttpResponse(slug)
+		    article = Article.objects.get(slug=slug)
+		    return render(request, 'articles/article_detail.html', { 'article': article })
+
+		@login_required(login_url="/accounts/login/") 	#2. if not login redirect to login page
+		def article_create(request):
+		    return render(request, 'articles/article_create.html')
+
+3. django-playlist\djangonautic\articles\templates\articles\article_create.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		    <div class="create-article">
+		        <h2>Create an Awesome New Article</h2>
+		    </div>
+		{% endblock %}
+
+4. django-playlist\djangonautic\accounts\templates\accounts\login.html
+
+		{% extends 'base_layout.html' %}
+
+		{% block content %}
+		    <h1>Log in</h1>
+		    <form class="site-form" action="{% url 'accounts:login' %}" method="post">
+		        {% csrf_token %}
+		        {{ form }}
+		        {% if request.GET.next %} 										#1. if naa ang next sa url
+		        <input type="hidden" name="next" value="{{request.GET.next}}"> 	#2. display the next value
+		        <input type="submit" value="Login" />
+		    </form>
+		    <p>Not got an account? <a href="{% url 'accounts:signup' %}">Sign Up</a></p>
+		{% endblock %}
+
+5. django-playlist\djangonautic\accounts\views.py
+
+		from django.shortcuts import render, redirect
+		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+		from django.contrib.auth import login, logout
+
+		def signup_view(request):
+		    if request.method == 'POST':
+		         form = UserCreationForm(request.POST)
+		         if form.is_valid():
+		             user = form.save()
+		             #  log the user in
+		             login(request, user)
+		             return redirect('articles:list')
+		    else:
+		        form = UserCreationForm()
+		    return render(request, 'accounts/signup.html', { 'form': form })
+
+		def login_view(request):
+		    if request.method == 'POST':
+		        form = AuthenticationForm(data=request.POST)
+		        if form.is_valid():
+		            # log the user in
+		            user = form.get_user()
+		            login(request, user)
+		            if 'next' in request.POST:                      #1.
+		                return redirect(request.POST.get('next'))
+		            else:
+		                return redirect('articles:list')
+		    else:
+		        form = AuthenticationForm()
+		    return render(request, 'accounts/login.html', { 'form': form })
+
+		def logout_view(request):
+		    if request.method == 'POST':
+		            logout(request)
+		            return redirect('articles:list')
+
+
+26. insert text, textarea and image, use forms.py represent of models
+*********************************************************************
+1. articles\forms.py
+
+		from django import forms
+		from . import models
+
+		class CreateArticle(forms.ModelForm):
+		    class Meta:
+		        model = models.Article 	#1. articles folder, models.py
+		        fields = ['title', 'body', 'slug', 'thumb',]
+
+2. articles\views.py
+
+		from django.http import HttpResponse
+		from django.shortcuts import render, redirect
+		from .models import Article
+		from django.contrib.auth.decorators import login_required
+		from . import forms     #1. forms.py
+
+		def article_list(request):
+		    articles = Article.objects.all().order_by('date');
+		    return render(request, 'articles/article_list.html', { 'articles': articles })
+
+		def article_detail(request, slug):
+		    # return HttpResponse(slug)
+		    article = Article.objects.get(slug=slug)
+		    return render(request, 'articles/article_detail.html', { 'article': article })
+
+		@login_required(login_url="/accounts/login/")
+		def article_create(request):     #2. article_create.html
+		    if request.method == 'POST':     #3. if forms is send in article_create.html
+		        form = forms.CreateArticle(request.POST, request.FILES)     #4. get the form data to forms.py, class CreateArticle, request.FILES is like img
+		        if form.is_valid():
+		            # save article to db
+		            return redirect('articles:list')
+		    else:
+		        form = forms.CreateArticle()    #5. forms.py, class CreateArticle
+		    return render(request, 'articles/article_create.html', { 'form': form })
+
+3. articles\templates\articles\article_create.html
+
+			{% extends 'base_layout.html' %}
+
+			{% block content %}
+			    <div class="create-article">
+			        <h2>Create an Awesome New Article</h2>
+			       # meaning send the data to {% url 'articles:create' %} found in urls.py, app_name = 'articles', url(r'^create/$') 
+			        <form class="site-form" action="{% url 'articles:create' %}" method="post" enctype="multipart/form-data">
+			            {% csrf_token %}
+			            {{ form }} 	# is the form of views.py/return render(request, 'articles/article_create.html', {'form': form}) 
+			            <input type="submit" value="Create">
+			        </form>
+			    </div>
+			{% endblock %}
+
+4. articles\urls.py
+
+			from django.conf.urls import url
+			from . import views
+
+			app_name = 'articles'
+
+			urlpatterns = [
+			    url(r'^$', views.article_list, name="list"),
+			    url(r'^create/$', views.article_create, name="create"),
+			    url(r'^(?P<slug>[\w-]+)/$', views.article_detail, name="detail"),
+			]
+
+to run: localhost:8000/articles/create/
+
+
+27. FOREIGN KEYS 
+****************
+1. 	- "comment" this part first para dili mag error in models.py # author = models.ForeignKey(User, default=None)
+	- delete all the data of articles from the account of shaun
+	- "uncomment" this part first para dili mag error in models.py # author = models.ForeignKey(User, default=None)
+2. django-playlist\djangonautic\python manage.py makemigrations
+   django-playlist\djangonautic\python manage.py migrate
+
+3. django-playlist\djangonautic\articles\models.py
+
+		from django.db import models
+		from django.contrib.auth.models import User 	#1.
+
+		# Create your models here.
+		class Article(models.Model):
+		    title = models.CharField(max_length=100)
+		    slug = models.SlugField()
+		    body = models.TextField()
+		    date = models.DateTimeField(auto_now_add=True)
+		    thumb = models.ImageField(default='default.png', blank=True)
+		    author = models.ForeignKey(User, default=None) 		#2. User is the user in the database
+			#or use this if error
+		    #author = models.ForeignKey(User, on_delete=models.PROTECT)
+
+		    def __str__(self):
+		        return self.title
+
+		    def snippet(self):
+		        return self.body[:50] + '...'
+
+4. django-playlist\djangonautic\articles\views.py
+
+		from django.http import HttpResponse
+		from django.shortcuts import render, redirect
+		from .models import Article
+		from django.contrib.auth.decorators import login_required
+		from . import forms
+
+		def article_list(request):
+		    articles = Article.objects.all().order_by('date');
+		    return render(request, 'articles/article_list.html', { 'articles': articles })
+
+		def article_detail(request, slug):
+		    # return HttpResponse(slug)
+		    article = Article.objects.get(slug=slug)
+		    return render(request, 'articles/article_detail.html', { 'article': article })
+
+		@login_required(login_url="/accounts/login/")
+		def article_create(request):
+		    if request.method == 'POST':    #1. if forms is send
+		        form = forms.CreateArticle(request.POST, request.FILES)    #2. get the text and image
+		        if form.is_valid():
+		            # save article to db
+		            instance = form.save(commit=False)
+		            instance.author = request.user      #3. get the author or the use who login
+		            instance.save()
+		            return redirect('articles:list')
+		    else:
+		        form = forms.CreateArticle()
+		    return render(request, 'articles/article_create.html', { 'form': form })
+
+to run: localhost:8000/articles/create/ - meaning kong kinsay naka login inig insert sa data kay mo appear sad didto ang author
+		localhost:8000/admin/
+
+
+28. CHECKING LOGIN STATUS
+*************************
+1. django-playlist\djangonautic\templates\base_layout.html
+
+		{% load static from staticfiles %}
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>Djangonauts</title>
+		        <link rel="stylesheet" href="{% static 'styles.css' %}">
+		    </head>
+		    <body>
+		        <header class="wrapper">
+		            <h1><a href="{% url 'articles:list' %}"><img src="{% static 'logo.png' %}" alt="djangonautic" /></a></h1>
+		            <nav>
+		                <ul>
+		                    #1. if user.is_authenticated or if user login
+		                    {% if user.is_authenticated %}
+		                    <li>
+		                        <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">
+		                            {% csrf_token %}
+		                            <button type="submit">Logout</button>
+		                        </form>
+		                    </li>
+		                    <li><a href="{% url 'articles:create' %}" class="highlight">New Article</a></li>
+		                    #2. if user.is_authenticated or if user not login
+		                    {% else %}
+		                    <li><a href="{% url 'accounts:login' %}">Login</a></li>
+		                    <li><a href="{% url 'accounts:signup' %}">Signup</a></li>
+		                    {% endif %}
+		                </ul>
+		            </nav>
+		        </header>
+		        <div class="wrapper">
+		            {% block content %}
+		            {% endblock %}
+		        </div>
+		    </body>
+		</html>
+
+
+29. REDIRECT THE HOMEPAGE
+*************************
+1. django-playlist\djangonautic\urls.py
+
+		from django.conf.urls import url, include
+		from django.contrib import admin
+		from . import views
+		from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+		from django.conf.urls.static import static
+		from django.conf import settings
+		from articles import views as article_views 	#1.
+
+		urlpatterns = [
+		    url(r'^admin/', admin.site.urls),
+		    url(r'^articles/', include('articles.urls')),
+		    url(r'^accounts/', include('accounts.urls')),
+		    url(r'^about/$', views.about),
+		    url(r'^$', article_views.article_list, name="home"), 	#2.
+		]
+
+		urlpatterns += staticfiles_urlpatterns()
+		urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+1. django-playlist\djangonautic\templates\base_layout.html
+
+		{% load static from staticfiles %}
+		<!DOCTYPE html>
+		<html>
+		    <head>
+		        <meta charset="utf-8">
+		        <title>Djangonauts</title>
+		        <link rel="stylesheet" href="{% static 'styles.css' %}">
+		    </head>
+		    <body>
+		        <header class="wrapper">
+		            #1. rl 'home' is the name="home" in urls.py like url(r'^$', article_views.article_list, name="home"),
+		            <h1><a href="{% url 'home' %}"><img src="{% static 'logo.png' %}" alt="djangonautic" /></a></h1>
+		            <nav>
+		                <ul>
+		                    {% if user.is_authenticated %}
+		                    <li>
+		                        <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">
+		                            {% csrf_token %}
+		                            <button type="submit">Logout</button>
+		                        </form>
+		                    </li>
+		                    <li><a href="{% url 'articles:create' %}" class="highlight">New Article</a></li>
+		                    {% else %}
+		                    <li><a href="{% url 'accounts:login' %}">Login</a></li>
+		                    <li><a href="{% url 'accounts:signup' %}">Signup</a></li>
+		                    {% endif %}
+		                </ul>
+		            </nav>
+		        </header>
+		        <div class="wrapper">
+		            {% block content %}
+		            {% endblock %}
+		        </div>
+		    </body>
+		</html>
+
+to run: http://localhost:8000/
+
+
+
+
+3
+
+
+
+
+DONE
+
+-->
