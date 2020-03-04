@@ -11,6 +11,7 @@ GET - receiving data from the database
 POST - sending data from the database
 urls.py - is use for address bar path like .com/about
 views.py - get the html page to display
+slug - url display
 
 
 
@@ -24,16 +25,21 @@ pitch, aaaa1234
 3. DISPLAY TEXT USING URLS & VIEWS
 4. DISPLAY HTML
 5. CREATE APPS INSIDE ADMIN APPS
-6-7. DATABASE, MODELS, MIGRATIONS
+	
+	(main) or project folder 	- homepage app or homepage (folder) with db, ui and etc.
+								- user app or user (folder) with db, ui and etc.
+								- accounts app or accounts (folder) with db, ui and etc.
+								- articles app or articles (folder) with db, ui and etc.
+
+6-7. CREATE DATABASE, MODELS, MIGRATIONS
 SERVER
 8. ORM (query to database/crud using console)
 9. CREATE ADMIN USER & DISPLAY ARTICLES APPS TO ADMIN PAGE (you can crud data here)
-10. DISPLAY ARTICLES DATA TO THE PAGE
-DISPLAY DATABASE/MODELS DATA TO SUB APPS PAGE
-11. DISPLAY MODEL METHOD or FUNCTION like example display only 50 character
+10. DISPLAY ARTICLES DATABASE DATA TO THE PAGE (select, order by)
+11. DISPLAY MODEL METHOD or FUNCTION (display only 50 character from body field)
 12. STATIC FILES & IMAGES like css, js, jquery, background image
 13. EXTENDING TEMPLATES - like buk-on nimo ang header or footer or other content in the page
-14-15. DISPLAY LINK IN THE URL, display image
+14-15. DISPLAY LINK IN THE URL, display and link image, create link
 16. CLICK LINK & DISPLAY DATA OF THE DATABASE
 17. UPLOADING MEDIA - insert to database, display image and default image in articles
 18-20. REGISTER USER ACCOUNTS APP - register, form trapping, user already exist
@@ -155,14 +161,14 @@ C:\project-folder\djangonautic> python manage.py runserver 			#this will run 127
 
 5. CREATE APPS INSIDE ADMIN APPS
 ********************************
-1. C:\project-folder\djangonautic> python manage.py startapp articles 					# this will create new app and name articles
-2. C:\project-folder\djangonautic\articles\urls.py> 									# create urls.py inside articles folder
+1. C:\project-folder\djangonautic> python manage.py startapp articles 		# this will create new app and name articles
+2. C:\project-folder\djangonautic\articles\urls.py> 						# create urls.py inside articles folder
 
-		from django.conf.urls import url
-		from . import views 	#1. views.py in the same folder
+		from django.conf.urls import url 	#url is use for address bar path
+		from . import views 				#1. views.py in the same folder
 
 		urlpatterns = [
-		    url(r'^$', views.article_list), 	#2. views.py, article_list function
+		    url(r'^$', views.article_list), #2. homepage - views.py, article_list function
 		]
 
 3. C:\project-folder\djangonautic\articles\views.py> 									
@@ -170,9 +176,9 @@ C:\project-folder\djangonautic> python manage.py runserver 			#this will run 127
 		from django.shortcuts import render
 
 		def article_list(request):
-		    return render(request, 'articles/article_list.html') 	#1. articles\templates\articles\article_list.html
+		    return render(request, 'articles/article_list.html') 					#1. articles\templates\articles\article_list.html
 
-4. C:\project-folder\djangonautic\articles\templates\articles\article_list.html>		# create article_list.html inside articles folder
+4. C:\project-folder\djangonautic\articles\templates\articles\article_list.html>	# create article_list.html inside articles folder
 
 		<!DOCTYPE html>
 		<html>
@@ -185,21 +191,21 @@ C:\project-folder\djangonautic> python manage.py runserver 			#this will run 127
 		    </body>
 		</html>
 
-5. C:\project-folder\djangonautic\djangonautic\settings.py> 							# add this at the bottom
+5. C:\project-folder\djangonautic\djangonautic\settings.py> 	#add this at the bottom
 
 		INSTALLED_APPS = [
-		    'articles',
+		    'articles', 										#meaning include articles app to all apps
 		]
 
-6. C:\project-folder\djangonautic\djangonautic\urls.py> 								# register the sub apps or the articles apps
+6. C:\project-folder\djangonautic\djangonautic\urls.py> 		#register the sub apps or the articles apps
 
-		from django.conf.urls import url, include 	#1.
+		from django.conf.urls import url, include 				#1. include is use to inclide articles app to djangonautic app or home app
 		from django.contrib import admin
 		from . import views
 
 		urlpatterns = [
 		    url(r'^admin/', admin.site.urls),
-		    url(r'^articles/', include('articles.urls')), 	#2. articles(folder), urls.py to run localhost:8000/articles/
+		    url(r'^articles/', include('articles.urls')), 		#2. articles(folder), urls.py to run localhost:8000/articles/
 		    url(r'^about/$', views.about),
 		    url(r'^$', views.homepage),
 		]
@@ -209,27 +215,31 @@ C:\project-folder\djangonautic> python manage.py runserver 			#this will run 127
 
 
 
-6-7. DATABASE, MODELS, MIGRATIONS
-*********************************
-1. models.py 	# here you can manage database tables
+6-7. CREATE DATABASE, MODELS, MIGRATIONS
+****************************************
+1. articles(folder)/models.py 	#here you can manage database tables
 
 				from django.db import models 	#1. models.py
 
-				# Create your models here.
+				#Create your models here
+				#id is autimatic create when create and table
+
 				class Article(models.Model):
-				    title = models.CharField(max_length=100)
+				    title = models.CharField(max_length=100) or models.CharField()
 				    slug = models.SlugField()
 				    body = models.TextField()
-				    date = models.DateTimeField(auto_now_add=True)
-				    # add in thumbnail later
-				    # add in author later
+				    date = models.DateTimeField(auto_now_add=True) 	#auto_now_add=True is when insert new data in will automatically insert date also
+				    #add in thumbnail later
+				    #add in author later
 
 2. C:\project-folder\djangonautic> python manage.py migrate
 3. C:\project-folder\djangonautic> python manage.py makemigrations
 
-Note: 	- this will create file in C:\project-folder\djangonautic\articles\migrations\0001_initial.py>
+Note: 	- this will create file in C:\project-folder\djangonautic\articles\migrations\0001_initial.py> 	#0001_initial.py here you can edit database
 		- after makemigrations it will automatically create id for primary key
 		- everytime you make changes in models.py always run the python manage.py makemigrations and python manage.py migrate
+
+Documentation: https://docs.djangoproject.com/en/1.11/
 
 
 
@@ -241,31 +251,34 @@ sample1: 	>>> from articles.models import Article 		# input: articles(folder), m
 			>>> Article 							 		# input: 
 			<class 'articles.models.Article'>		 		# output: 
 
-retrieve:	>>> Article.objects.all() 						# input: same with select all Article(table) in the database
+display:	>>> Article.objects.all() 						# input: same with select all Article(table) in the database
 			<QuerySet []>									# ouput: meaning no data inserted
 
 			>>> <title></title>								# input: meaning select the title of the first id or the first data
 			
+-----------------------------------------------------------------------------------------
 
-insert:		>>> article = Article() 						# input: create aticle object
-			>>> article 			 						# input:
-			<Article: Article object> 				 		# output: 
+sample2:
 
-			>>> article.title = "Hello, world"				# input: insert data to title field
-			>>> article.title 								# input
+insert:		>>> article = Article() 						# input: create new article object
+			>>> article 			 						# input: create new field and name it title
+			<Article: Article object> 				 		# output: object only, no properties
+
+insert:		>>> article.title = "Hello, world"				# input: insert data to title field
+			>>> article.title 								# input: to display
 			'hello, world' 									# output
-			>>> article.save() 								# input: this will save hello, world in the database in the title field
-			>>> Article.objects.all() 						# input: same with select all Article(table) in the database
+save:		>>> article.save() 								# input: this will (save) hello, world in the database in the title field
+select:		>>> Article.objects.all() 						# input: same with select all Article(table) in the database
 			<QuerySet [<Article: Article object <1>>]> 		# ouput: meaning 1 data inserted
 
-			>>> Article.objects.all()[0].title
+display:	>>> Article.objects.all()[0].title 				# display only title field, Article(table name), objects(data), all(display all), 0(first id)
 			'hello, world'
 
 close orm: 	>>> ^Z or cntrl+z
 
 --------------------------------------------------------------------------------------------
 
-sample2:  update this part to this
+sample3:  update this part to this
 
   1. models.py 	# here you can manage database tables
 
@@ -280,22 +293,31 @@ sample2:  update this part to this
 				    # add in thumbnail later
 				    # add in author later
 
-				    def __str__(self): 		#note: ang outpur niya sa orm kay <QuerySet [<Article: Hello, world>]> dili na ingon ani <QuerySet [<Article: Article object <1>>]>
+				    def __str__(self): 		#note: ang output niya sa orm kay <QuerySet [<Article: Hello, world>]> dili na ingon ani <QuerySet [<Article: Article object <1>>]>
 				        return self.title
 
 
 2. C:\project-folder\djangonautic> python manage.py shell 	# this will open an interactive shell like this >>>
 
-retrieve: 	>>> from articles.models import Article 		# input: articles(folder), models.py add library import Article
-			>>> Article.objects.all() 				 		# input: 
-			<QuerySet [<Article: Hello, world>]>	 		# output: lain na ang output dili na ingon ani <QuerySet [<Article: Article object <1>>]>
+		 	>>> from articles.models import Article 		# input: articles(folder), models.py add library import Article
+select: 	>>> Article.objects.all() 				 		# input: 
+display:	<QuerySet [<Article: Hello, world>]>	 		# output: lain na ang output dili na ingon ani <QuerySet [<Article: Article object <1>>]>
 
-insert:		>>> article2 = Article() 						# input: insert other data
-			>>> article2.title = "Django Rules"				# input:
-			>>> article2.save() 							# input:
+object:		>>> article2 = Article() 						# input: insert other data
+insert:		>>> article2.title = "Django Rules"				# input:
+save:		>>> article2.save() 							# input:
 
-			>>> Article.objects.all() 				 		# input: display new inserted data
-			<QuerySet [<Article: Hello, world>, [<Article: Django, Rules>]>
+select:		>>> Article.objects.all() 				 		# input: display new inserted data
+output:		<QuerySet [<Article: Hello, world>
+
+--------------------------------------------------------------------------------------------
+
+object:		>>> article2 = Article() 						# input: create other object and name it article2
+insert:		>>> article2.title = "Django Rules"				# input: insert field Django Rules 
+save:		>>> article2.save() 							# input: save to db
+
+select:		>>> Article.objects.all() 				 		# input: display new inserted data
+output:		<QuerySet [<Article: Hello, world>, [<Article: Django, Rules>]>
 
 close orm: 	>>> ^Z or cntrl+z
 
@@ -303,39 +325,43 @@ close orm: 	>>> ^Z or cntrl+z
 
 9. CREATE ADMIN USER & DISPLAY ARTICLES APPS TO ADMIN PAGE (you can crud data here)
 ***********************************************************************************
-note: display articles database/models to admin page where you can crud data
+note: - display articles database/models to admin page where you can crud data
+	  - admin can control the content of the website, databases, users etc.
 
 1. C:\project-folder\djangonautic> python manage.py runserver
 2. http://localhost:8000/admin/															# this will open admin login page
-3. create account: C:\project-folder\djangonautic> python manage.py createsuperuser 	# create username and password
+3. create account: C:\project-folder\djangonautic> python manage.py createsuperuser 	# create username and password (createsuperuser has access to admin area)
+4. C:\project-folder\djangonautic> python manage.py runserver
 
-4. articles\admin.py 					
+note: green check in the databese is (superuser account)
+
+5. articles\admin.py 					
 											
    	from django.contrib import admin 	#1. admin.py
 	from . models import Article 		#2. from models.py the class Article
 
-	admin.site.register(Article) 		#3. register Article class or database or models to admin login page
+	admin.site.register(Article) 		#3. register Article class, this field will automatically appear in the database ui page
 
 
-10 DISPLAY ARTICLES DATA TO THE PAGE
-************************************
+10 DISPLAY ARTICLES DATABASE DATA TO THE PAGE
+*********************************************
 articles\views.py	
-	from django.shortcuts import render
-	from . models import Article 	#1. models.py class Article
+	from django.shortcuts import render 	#render is use to display html
+	from . models import Article 			#1. models.py, class Article
 
 	# Create your views here.
 	def article_list(request):
-		articles = Article.objects.all().order_by('date') 	#2. select * from Articles table order by date
+		articles = Article.objects.all().order_by('date') 								#2. select * from Articles table order by date
 		return render(request, 'articles/article_list.html', {'articles': articles}) 	#3. 'articles' data will display to article_list.html	
-
+																						#{'articles': articles} - is called dictionary
 articles\templates\articles\article_lisht.html
 	<body>
 		<h1>Article List</h1>
 		<div class="articles">
-			{% for article in articles %}
-				<div class="article">
-					<h2><a href="#">{{ article.title }}</a></h2>
-					<p>{{ article.body }}</p>
+			{% for article in articles %} 							#{% %} for python code, article in articles getting the data of {'articles': articles})
+				<div class="article"> 								#class="article" - this will store all data from the database								
+					<h2><a href="#">{{ article.title }}</a></h2> 	#class="article" - this will store all data from the database
+					<p>{{ article.body }}</p> 						#{{ }} output data in the python code
 					<p>{{ article.date }}</p>
 				</div>
 			{% endfor %}
@@ -343,7 +369,7 @@ articles\templates\articles\article_lisht.html
 	</body>
 
 
-11. DISPLAY MODEL METHOD or FUNCTION
+11. DISPLAY MODEL METHOD or FUNCTION (display only 50 character from body field)
 ************************************
 1. articles\models.py 	from django.db import models
 
@@ -359,7 +385,7 @@ articles\templates\articles\article_lisht.html
 							def __str__(self):
 								return self.title
 
-							def snippet(self): 					#1. display only 50 character from body field
+							def snippet(self): 						#1. display only 50 character from body field
 								return self.body[:50] + '...'
 
 2. articles\templates\articles\article_lisht.html
@@ -369,7 +395,7 @@ articles\templates\articles\article_lisht.html
 			{% for article in articles %}
 				<div class="article">
 					<h2><a href="#">{{ article.title }}</a></h2>
-					<p>{{ article.snippet }}</p> 				#2. 
+					<p>{{ article.snippet }}</p> 					#2. display only 50 character from body field
 					<p>{{ article.date }}</p>
 				</div>
 			{% endfor %}
@@ -394,10 +420,10 @@ djangonautic\urls.py 		from django.contrib import admin
 							urlpatterns += staticfiles_urlpatterns() 	#2. use the library
 
 
-djangonautic\settings.py 	STATIC_URL = '/static/'
+djangonautic\settings.py 	STATIC_URL = '/static/' 					#to run: localhost:8000/static/styles.css or /assets/ or whatever you want
 
 							STATICFILES_DIRS = (						#1.
-							    os.path.join(BASE_DIR, 'assets'),
+							    os.path.join(BASE_DIR, 'assets'), 		#joining 2 path the BASE_DIR(or the project folder) and assets
 							)	
 
 
@@ -439,7 +465,7 @@ djangonautic\articles\templates\articles\article_list.html
 
 13. EXTENDING TEMPLATES
 *******************
-1. djangonautic(main)\templates\base_layout.html
+1. djangonautic(main)\templates\base_layout.html 	#paste here the (html) header code
 
 		{% load static from staticfiles %}
 
@@ -461,7 +487,7 @@ djangonautic\articles\templates\articles\article_list.html
 		</html>
 
 
-2. djangonautic\articles\templates\articles\article_list.html
+2. djangonautic\articles\templates\articles\article_list.html 	#paste here the html (body) code
 
 		{% extends 'base_layout.html' %} 	#1. this will extend the header and footer
 
@@ -487,11 +513,11 @@ djangonautic\articles\templates\articles\article_list.html
 		from . import views
 
 		#this is use para naa sa articles ra tanan ang url slug
-		app_name = 'articles' 	#1.
+		app_name = 'articles' 													#1.
 
 		urlpatterns = [
-		    url(r'^$', views.article_list, name="list"), 	#2.
-		    url(r'^(?P<slug>[\w-]+)/$', views.article_detail, name="detail"), 	#3.
+		    url(r'^$', views.article_list, name="list"), 						#2. name="list" or this url called list
+		    url(r'^(?P<slug>[\w-]+)/$', views.article_detail, name="detail"), 	#3. \w-]+ meaning disan pila ka character ang url or link
 		]
 
 2. djangonautic\articles\views.py
@@ -560,10 +586,9 @@ to run: http://localhost:8000/articles/
 		    articles = Article.objects.all().order_by('date');
 		    return render(request, 'articles/article_list.html', { 'articles': articles })
 
-		def article_detail(request, slug): 	#1.
-		    # return HttpResponse(slug)
-		    article = Article.objects.get(slug=slug)
-		    return render(request, 'articles/article_detail.html', {'article': article})
+		def article_detail(request, slug):
+		    article = Article.objects.get(slug=slug) 											#1. get the object or the data of the db
+		    return render(request, 'articles/article_detail.html', {'article': article}) 		#2. display the data to html
 
 2. djangonautic\articles\tempaltes\articles\article_detail.html
 
