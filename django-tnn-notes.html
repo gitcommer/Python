@@ -41,9 +41,10 @@ SERVER
 13. EXTENDING TEMPLATES - like buk-on nimo ang header or footer or other content in the page
 14-15. DISPLAY LINK IN THE URL, display and link image, create link
 16. CLICK LINK & DISPLAY DATA OF THE DATABASE
-17. UPLOADING MEDIA - insert to database, display image and default image in articles
-18-20. REGISTER USER ACCOUNTS APP - register, form trapping, user already exist
-								  - adto ma save sa admin ang new register pero dili maka login as admin
+17. UPLOADING MEDIA - insert image to database, display image and default image in articles
+18-20. REGISTER USER ACCOUNTS APP - register user, form trapping, user already exist, redirect page
+								  - you can add user account in admin database
+								  - adto ma save sa admin ang new register pero dili maka login si user as admin
 21. LOGIN & REDIRECT TO PAGE
 22. sign-up and login new user but this user cant access the admin
 23. LOGOUT BUTTON
@@ -610,17 +611,17 @@ to run: http://localhost:8000/articles/
 *******************
 1. project-folder\djangonautic\settings.py 			# add this in the bottom
 
-	MEDIA_URL = '/media/'                           #1.
-	MEDIA_ROOT = os.path.join(BASE_DIR, 'media')    #2.
-
+	MEDIA_URL = '/media/'                           #1. media is a (folder) where you upload the images you can name it pics or anything you like
+	MEDIA_ROOT = os.path.join(BASE_DIR, 'media')    #2. the folder where you upload the images
+													#os.path.join(BASE_DIR, 'media' - joining 2 path the base BASE_DIR and media
 2. project-folder\djangonautic\urls.py
 
 	from django.contrib import admin 	
 	from django.urls import path, include 				
 	from . import views
 	from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-	from django.conf.urls.static import static 	#1.	
-	from django.conf import settings 	#2.								
+	from django.conf.urls.static import static 		#1. static use for media files
+	from django.conf import settings 				#2.	will access settings.py	data					
 
 	urlpatterns = [
 	    path('admin/', admin.site.urls), 				
@@ -631,7 +632,7 @@ to run: http://localhost:8000/articles/
 
 	urlpatterns += staticfiles_urlpatterns() 
 
-	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 	#3.
+	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 	#3. access MEDIA_URL  MEDIA_ROOT in settings.py
 
 3. project-folder\djangonautic\articles\models.py
 
@@ -652,17 +653,16 @@ to run: http://localhost:8000/articles/
 		def snippet(self):
 			return self.body[:50] + '...'
 
-4. project-folder\djangonautic> pip install Pillow
+4. project-folder\djangonautic> pip install Pillow 						#1. Pillow is a package to use (image field) in the db and upload button
 5. project-folder\djangonautic> python manage.py makemigrations
 6. project-folder\djangonautic> python manage.py migrate
 
 7. project-folder\djangonautic\articles\templates\articles\article_detail.html
 
-		
 	{% block content %}
 	<div class="article-detail">
 		<div class="article">
-			<img src="{{ article.thumb.url }}"> 	#1.
+			<img src="{{ article.thumb.url }}"> 	#1. to display image
 			<h2>{{ article.title }}</h2>
 			<p>{{ article.body }}</p>
 			<p>{{ article.date }}</p>
@@ -670,17 +670,23 @@ to run: http://localhost:8000/articles/
 	</div>
 	{% endblock %}
 
+note: for default image add image that named default.png
+
+run: python manage.py runserver
+	 http://localhost:8000/articles/
+
 
 18-20. REGISTER USER ACCOUNTS APP
 *********************************
-1. project-folder\djangonautic> python manage.py startapp accounts 		# this will create new mvc app folder name account
-2. project-folder\djangonautic\settings.py 								# add this in the bottom
+1. project-folder\djangonautic> python manage.py startapp accounts 		#this will create new mvc app folder name account
+2. project-folder\djangonautic\settings.py 								#add this in the bottom
 
 		INSTALLED_APPS = [ 
-			'accounts',
+			'django.contrib.auth', 										#this is use for trapping field (double check if aready exists)
+			'accounts', 												#use for user accounts
 		]
 
-3. project-folder\djangonautic\accounts\urls.py 						# create urls.py and add
+3. project-folder\djangonautic\accounts\urls.py 						#create urls.py and add
 
 		from django.conf.urls import url
 		from . import views
@@ -688,7 +694,7 @@ to run: http://localhost:8000/articles/
 		app_name = 'accounts'
 
 		urlpatterns = [
-		    url(r'^signup/$', views.signup_view, name="signup"),
+		    url(r'^signup/$', views.signup_view, name="signup"), 		#use if register or login
 		]
 
 4. project-folder\djangonautic\urls.py 
@@ -715,7 +721,7 @@ to run: http://localhost:8000/articles/
 5. project-folder\djangonautic\accounts\views.py
 
 		from django.shortcuts import render, redirect
-		from django.contrib.auth.forms import UserCreationForm 	#1
+		from django.contrib.auth.forms import UserCreationForm 					#1 the is the forms of login/register
 
 		def signup_view(request):
 		    if request.method == 'POST':
@@ -725,7 +731,7 @@ to run: http://localhost:8000/articles/
 		             #  log the user in
 		             return redirect('articles:list')
 		    else:
-		        form = UserCreationForm() 	#2
+		        form = UserCreationForm() 										#2
 		    return render(request, 'accounts/signup.html', { 'form': form }) 	#3
 
 6. project-folder\djangonautic\accounts\templates\accounts\signup.html
@@ -734,14 +740,17 @@ to run: http://localhost:8000/articles/
 
 		{% block content %}
 		    <h1>Signup</h1>
-		    <form class="site-form" action="{% url 'accounts:signup' %}" method="post">
+		    <form class="site-form" action="{% url 'accounts:signup' %}" method="post"> 	#login/registration page
 		        {% csrf_token %}
 		        {{ form }}
 		        <input type="submit" value="Signup">
 		    </form>
 		{% endblock %}
 
-to run: localhost:8000/accounts/signup/
+to run: python manage.py runserver
+		localhost:8000/accounts/signup/
+
+question: how to edit, forms page
 
 
 21. LOGIN & REDIRECT TO PAGE
@@ -1285,11 +1294,8 @@ to run: http://localhost:8000/
 
 
 
-3
+20
 
 
-
-
-DONE
 
 -->
