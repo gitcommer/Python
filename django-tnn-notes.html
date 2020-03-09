@@ -12,6 +12,7 @@ POST - sending data from the database
 urls.py - is use for address bar path like .com/about
 views.py - get the html page to display
 slug - url display
+{% csrf_token %} - is a security that check if the request from django application
 
 
 
@@ -31,8 +32,7 @@ pitch, aaaa1234
 								- accounts app or accounts (folder) with db, ui and etc.
 								- articles app or articles (folder) with db, ui and etc.
 
-6-7. CREATE DATABASE, MODELS, MIGRATIONS
-SERVER
+6-7. CREATE DATABASE, MODELS, MIGRATIONS SERVER
 8. ORM (query to database/crud using console)
 9. CREATE ADMIN USER & DISPLAY ARTICLES APPS TO ADMIN PAGE (you can crud data here)
 10. DISPLAY ARTICLES DATABASE DATA TO THE PAGE (select, order by)
@@ -42,14 +42,15 @@ SERVER
 14-15. DISPLAY LINK IN THE URL, display and link image, create link
 16. CLICK LINK & DISPLAY DATA OF THE DATABASE
 17. UPLOADING MEDIA - insert image to database, display image and default image in articles
-18-20. REGISTER USER ACCOUNTS APP - register user, form trapping, user already exist, redirect page
+18-20. REGISTER USER ACCOUNTS APP - register admin or user, form trapping, user already exist, redirect page
 								  - you can add user account in admin database
 								  - adto ma save sa admin ang new register pero dili maka login si user as admin
-21. LOGIN & REDIRECT TO PAGE
+								  - determine get or post request when sign-up
+21. LOGIN & REDIRECT TO PAGE - login, trapping, redirect
 22. sign-up and login new user but this user cant access the admin
 23. LOGOUT BUTTON
 24-25. IF NOT LOGIN REDIRECT TO LOGIN PAGE IF LOGIN REDIRECT TO HOME PAGE
-26. insert text, textarea and image, use forms.py represent of models
+26. create new forms with insert text, textarea and image, using forms.py represent of models
 27. FOREIGN KEYS - insert text, textarea, image and author(the user who login)
 28. CHECKING LOGIN STATUS - check if user login or not, display login/singup or logout
 29. REDIRECT THE HOMEPAGE
@@ -720,18 +721,20 @@ run: python manage.py runserver
 
 5. project-folder\djangonautic\accounts\views.py
 
+		#SIGN-UP
+
 		from django.shortcuts import render, redirect
 		from django.contrib.auth.forms import UserCreationForm 					#1 the is the forms of login/register
 
 		def signup_view(request):
-		    if request.method == 'POST':
-		         form = UserCreationForm(request.POST)
-		         if form.is_valid():
-		             form.save()
-		             #  log the user in
-		             return redirect('articles:list')
+		    if request.method == 'POST': 										#if it is post request
+		         form = UserCreationForm(request.POST) 							#get the information
+		         if form.is_valid(): 											#check the data if exists
+		             form.save() 												#save to db
+		             #log the user in
+		             return redirect('articles:list') 							#articles, urls.py
 		    else:
-		        form = UserCreationForm() 										#2
+		        form = UserCreationForm() 										#2 GET REQUEST code
 		    return render(request, 'accounts/signup.html', { 'form': form }) 	#3
 
 6. project-folder\djangonautic\accounts\templates\accounts\signup.html
@@ -740,7 +743,7 @@ run: python manage.py runserver
 
 		{% block content %}
 		    <h1>Signup</h1>
-		    <form class="site-form" action="{% url 'accounts:signup' %}" method="post"> 	#login/registration page
+		    <form class="site-form" action="{% url 'accounts:signup' %}" or action="/accounts/signup/" method="post"> 	#login/registration page
 		        {% csrf_token %}
 		        {{ form }}
 		        <input type="submit" value="Signup">
@@ -749,6 +752,7 @@ run: python manage.py runserver
 
 to run: python manage.py runserver
 		localhost:8000/accounts/signup/
+		localhost:8000/accounts/login/
 
 question: how to edit, forms page
 
@@ -788,7 +792,7 @@ question: how to edit, forms page
 
 		{% block content %}
 		    <h1>Log in</h1>
-		    <form class="site-form" action="{% url 'accounts:login' %}" method="post">
+		    <form class="site-form" action="{% url 'accounts:login' %}" or action="/accounts/login/" method="post">
 		        {% csrf_token %}
 		        {{ form }}
 		        <input type="submit" value="Login" />
@@ -819,27 +823,27 @@ how this works: login.html, urls.py, views.py
 
 		from django.shortcuts import render, redirect
 		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-		from django.contrib.auth import login 
+		from django.contrib.auth import login 				#1 this is the library for login
 
 		def signup_view(request):
 		    if request.method == 'POST':
 		         form = UserCreationForm(request.POST)
 		         if form.is_valid():
-		            user = form.save()                  #1.
+		            user = form.save()                  	#2
 		            #  log the user in
-		            login(request, user)                #2.
+		            login(request, user)                	#3
 		            return redirect('articles:list')
 		    else:
 		        form = UserCreationForm()
 		    return render(request, 'accounts/signup.html', { 'form': form })
 
-		def login_view(request): 			#note: dont name just login but login_view so that django dont confuse                               
+		def login_view(request): 							#note: dont name just login but login_view so that django dont confuse                               
 		    if request.method == 'POST':
 		        form = AuthenticationForm(data=request.POST)   
 		        if form.is_valid():
 		            # log the user in
-		            user = form.get_user() 	#get the username and password of the user             
-		            login(request, user)    #let the user login
+		            user = form.get_user() 					#get the username and password of the user             
+		            login(request, user)    				#let the user login
 		            return redirect('articles:list')            
 		    else:
 		        form = AuthenticationForm()
@@ -860,7 +864,7 @@ how this works: login.html, urls.py, views.py
 		{% endblock %}
 
 to run: localhost:8000/accounts/signup/
-		http://localhost:8000/accounts/login/
+		localhost:8000/accounts/login/
 
 note: if mo login ka sa login form kay naka login nsd siya automatically sa admin as shaun
 
@@ -886,6 +890,8 @@ note: if mo login ka sa login form kay naka login nsd siya automatically sa admi
 		from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 		from django.contrib.auth import login 
 
+		###SIGN-UP
+
 		def signup_view(request):
 		    if request.method == 'POST':
 		         form = UserCreationForm(request.POST)
@@ -897,6 +903,8 @@ note: if mo login ka sa login form kay naka login nsd siya automatically sa admi
 		    else:
 		        form = UserCreationForm()
 		    return render(request, 'accounts/signup.html', { 'form': form })
+
+		###LOGIN
 
 		def login_view(request):                                
 		    if request.method == 'POST':
@@ -910,10 +918,12 @@ note: if mo login ka sa login form kay naka login nsd siya automatically sa admi
 		        form = AuthenticationForm()
 		    return render(request, 'accounts/login.html', { 'form': form })
 
-		def logout_view(request):                   #1. 
-		    if request.method == 'POST':
-		        logout(request)                     #2. this is the built-in logout function
-		        return redirect('articles:list')    #3. articles app, list path
+		###LOGOUT
+
+		def logout_view(request):                   #1. when user click logout button
+		    if request.method == 'POST': 			#2. use POST request for logout not the get request
+		        logout(request)                     #3. this is the built-in logout function
+		        return redirect('articles:list')    #4. articles app, list path
 
 3. django-playlist\djangonautic\templates\base_layout.html
 
@@ -931,9 +941,9 @@ note: if mo login ka sa login form kay naka login nsd siya automatically sa admi
 		            <nav>
 		                <ul>
 		                    <li>
-		                        <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">   #2
+		                        <form class="logout-link" action="{% url 'accounts:logout' %}" method="post">   	#2
 		                            {% csrf_token %}
-		                            <button type="submit">Logout</button>   #1
+		                            <button type="submit">Logout</button>   										#1
 		                        </form>
 		                    </li>
 		                </ul>
@@ -1049,17 +1059,17 @@ to run: localhost:8000/articles/
 		            return redirect('articles:list')
 
 
-26. insert text, textarea and image, use forms.py represent of models
-*********************************************************************
+26. create new forms with insert text, textarea and image, using forms.py represent of models
+*********************************************************************************************
 1. articles\forms.py
 
-		from django import forms
+		from django import forms 								#using django forms from library
 		from . import models
 
-		class CreateArticle(forms.ModelForm):
-		    class Meta:
-		        model = models.Article 	#1. articles folder, models.py
-		        fields = ['title', 'body', 'slug', 'thumb',]
+		class CreateArticle(forms.ModelForm): 					#use the import forms from the library
+		    class Meta: 										#create class and name it Meta
+		        model = models.Article 							#articles folder, models.py
+		        fields = ['title', 'body', 'slug', 'thumb',] 	#fields in the database in models.py
 
 2. articles\views.py
 
@@ -1067,7 +1077,7 @@ to run: localhost:8000/articles/
 		from django.shortcuts import render, redirect
 		from .models import Article
 		from django.contrib.auth.decorators import login_required
-		from . import forms     #1. forms.py
+		from . import forms     														#1. call forms.py
 
 		def article_list(request):
 		    articles = Article.objects.all().order_by('date');
@@ -1079,15 +1089,15 @@ to run: localhost:8000/articles/
 		    return render(request, 'articles/article_detail.html', { 'article': article })
 
 		@login_required(login_url="/accounts/login/")
-		def article_create(request):     #2. article_create.html
-		    if request.method == 'POST':     #3. if forms is send in article_create.html
-		        form = forms.CreateArticle(request.POST, request.FILES)     #4. get the form data to forms.py, class CreateArticle, request.FILES is like img
+		def article_create(request):     												#2. article_create.html
+		    if request.method == 'POST':     											#3. if forms is send in article_create.html
+		        form = forms.CreateArticle(request.POST, request.FILES)     			#4. get the form data to forms.py, class CreateArticle, request.FILES is like img
 		        if form.is_valid():
 		            # save article to db
 		            return redirect('articles:list')
 		    else:
-		        form = forms.CreateArticle()    #5. forms.py, class CreateArticle
-		    return render(request, 'articles/article_create.html', { 'form': form })
+		        form = forms.CreateArticle()    										#5. forms.py, class CreateArticle
+		    return render(request, 'articles/article_create.html', { 'form': form }) 	#6. display data to html
 
 3. articles\templates\articles\article_create.html
 
@@ -1119,20 +1129,22 @@ to run: localhost:8000/articles/
 			]
 
 to run: localhost:8000/articles/create/
+		download/run/ok
 
 
 27. FOREIGN KEYS 
 ****************
-1. 	- "comment" this part first para dili mag error in models.py # author = models.ForeignKey(User, default=None)
+1. 	- "comment" this part first para dili mag error in models.py 		#author = models.ForeignKey(User, default=None)
 	- delete all the data of articles from the account of shaun
-	- "uncomment" this part first para dili mag error in models.py # author = models.ForeignKey(User, default=None)
+	- "uncomment" this part first para dili mag error in models.py 		#author = models.ForeignKey(User, default=None)
+
 2. django-playlist\djangonautic\python manage.py makemigrations
    django-playlist\djangonautic\python manage.py migrate
 
 3. django-playlist\djangonautic\articles\models.py
 
 		from django.db import models
-		from django.contrib.auth.models import User 	#1.
+		from django.contrib.auth.models import User 						#1. foreign key library
 
 		# Create your models here.
 		class Article(models.Model):
@@ -1141,7 +1153,7 @@ to run: localhost:8000/articles/create/
 		    body = models.TextField()
 		    date = models.DateTimeField(auto_now_add=True)
 		    thumb = models.ImageField(default='default.png', blank=True)
-		    author = models.ForeignKey(User, default=None) 		#2. User is the user in the database
+		    author = models.ForeignKey(User, default=None) 					#2. User is the user in the database
 			#or use this if error
 		    #author = models.ForeignKey(User, on_delete=models.PROTECT)
 
@@ -1170,12 +1182,12 @@ to run: localhost:8000/articles/create/
 
 		@login_required(login_url="/accounts/login/")
 		def article_create(request):
-		    if request.method == 'POST':    #1. if forms is send
-		        form = forms.CreateArticle(request.POST, request.FILES)    #2. get the text and image
+		    if request.method == 'POST':    								#1. if forms is send
+		        form = forms.CreateArticle(request.POST, request.FILES)    	#2. get the text and image
 		        if form.is_valid():
 		            # save article to db
 		            instance = form.save(commit=False)
-		            instance.author = request.user      #3. get the author or the use who login
+		            instance.author = request.user      					#3. get the author or the use who login
 		            instance.save()
 		            return redirect('articles:list')
 		    else:
@@ -1291,11 +1303,12 @@ to run: localhost:8000/articles/create/ - meaning kong kinsay naka login inig in
 
 to run: http://localhost:8000/
 
+---------------------------------------
+
+NOTE: Naay error inig run sa cmd in tutorial 27 to 32, just focus and follow the instruction in 27 to fix it.
 
 
-
-20
-
+27
 
 
 -->
